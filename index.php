@@ -1,9 +1,8 @@
 <?php
 require('../../config.php');
 require_login();
-require_capability('local/tagmanager:use', context_system::instance());
+require_capability('local/tagbuilder:use', context_system::instance());
 
-<<<<<<< HEAD:local_tagbuilder/index.php
 
 // Handle tag export
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['exporttags'])) {
@@ -26,12 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['exporttags'])) {
 }
 
 $PAGE->set_url('/local/tagbuilder/index.php');
-=======
-$PAGE->set_url('/local/tagmanager/index.php');
->>>>>>> 8ca6fb05984b457c3daec2cbc35159601b984235:index.php
 $PAGE->set_context(context_system::instance());
-$PAGE->set_title('Tag Manager');
-$PAGE->set_heading('Tag Manager');
+$PAGE->set_title('Tag Builder');
+$PAGE->set_heading('Tag Builder');
 
 echo $OUTPUT->header();
 
