@@ -1,6 +1,6 @@
 <?php
 $capabilities = [
-    'local/tagbuilder:use' => [
+    'local/tagmanager:use' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => [
