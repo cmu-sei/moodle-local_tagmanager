@@ -1,12 +1,12 @@
 <?php
 require('../../config.php');
 require_login();
-require_capability('local/tagbuilder:use', context_system::instance());
+require_capability('local/tagmanager:use', context_system::instance());
 
-$PAGE->set_url('/local/tagbuilder/index.php');
+$PAGE->set_url('/local/tagmanager/index.php');
 $PAGE->set_context(context_system::instance());
-$PAGE->set_title('Tag Builder');
-$PAGE->set_heading('Tag Builder');
+$PAGE->set_title('Tag Manager');
+$PAGE->set_heading('Tag Manager');
 
 echo $OUTPUT->header();
 

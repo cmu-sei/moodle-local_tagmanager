@@ -1,4 +1,4 @@
-# Tag Builder (local_tagbuilder) Moodle Plugin
+# Tag Manager (local_tagmanager) Moodle Plugin
 
 A lightweight Moodle admin plugin for managing tags in bulk. Supports uploading tags with descriptions, exporting all existing tags, and listing tag metadata in a clean, Bootstrap-styled interface.
 
@@ -19,9 +19,9 @@ A lightweight Moodle admin plugin for managing tags in bulk. Supports uploading 
 
 ## UI Location
 
-> **Site administration → Appearance → Tag Builder**
+> **Site administration → Appearance → Tag Manager**
 
-Or go directly to: `/local/tagbuilder/index.php`
+Or go directly to: `/local/tagmanager/index.php`
 
 ---
 
@@ -43,9 +43,9 @@ compliance,For governance or regulatory content
 
 ## Installation
 
-1. Drop this folder into `local/tagbuilder`
+1. Drop this folder into `local/tagmanager`
 2. Visit **Site administration → Notifications** to install
-3. Navigate to **Appearance → Tag Builder** to start using it
+3. Navigate to **Appearance → Tag Manager** to start using it
 
 ---
 

@@ -1,8 +1,8 @@
 <?php
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_tagbuilder';
-$plugin->version = 2025072500;
+$plugin->component = 'local_tagmanager';
+$plugin->version = 2025090500;
 $plugin->requires = 2022041900; // Moodle 4.0+
 $plugin->maturity = MATURITY_STABLE;
 $plugin->release = '1.0.0';
