@@ -1,33 +1,49 @@
 <?php
 require('../../config.php');
 require_login();
-require_capability('local/tagbuilder:use', context_system::instance());
 
+$context = context_system::instance();
+require_capability('local/tagmanager:use', $context);
 
-// Handle tag export
+// ---------- Early export ----------
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['exporttags'])) {
     global $DB;
     $collectionid = \core_tag_collection::get_default();
-    $tagrecords = $DB->get_records('tag', ['tagcollid' => $collectionid], 'rawname ASC');
-    
+    $tags = $DB->get_records('tag', ['tagcollid' => $collectionid], 'rawname ASC');
+
     header('Content-Type: text/csv');
     header('Content-Disposition: attachment; filename="tags_export.csv"');
-    
-    $output = fopen('php://output', 'w');
-    fputcsv($output, ['tagname', 'description']);
-    
-    foreach ($tagrecords as $tag) {
-        fputcsv($output, [$tag->rawname, $tag->description ?? '']);
+    $out = fopen('php://output', 'w');
+    fputcsv($out, ['tagname', 'description']);
+    foreach ($tags as $t) {
+        fputcsv($out, [$t->rawname, $t->description ?? '']);
     }
-    
-    fclose($output);
+    fclose($out);
     exit;
 }
 
-$PAGE->set_url('/local/tagbuilder/index.php');
-$PAGE->set_context(context_system::instance());
-$PAGE->set_title('Tag Builder');
-$PAGE->set_heading('Tag Builder');
+// ---------- Page ----------
+$PAGE->set_url('/local/tagmanager/index.php');
+$PAGE->set_context($context);
+$PAGE->set_title('Tag Manager');
+$PAGE->set_heading('Tag Manager');
+
+require_once($CFG->dirroot.'/local/tagmanager/classes/form/upload_tags_form.php');
+use local_tagmanager\form\upload_tags_form;
+
+$mform = new upload_tags_form();
+
+// Draft area before rendering.
+$draftid = file_get_submitted_draft_itemid('tagfile');
+file_prepare_draft_area(
+    $draftid,
+    $context->id,
+    'local_tagmanager',
+    'tagcsv',
+    0,
+    ['subdirs' => 0, 'maxfiles' => 1]
+);
+$mform->set_data(['tagfile' => $draftid]);
 
 echo $OUTPUT->header();
 
@@ -35,79 +51,101 @@ $uploadresults = [];
 $showtags = false;
 $tags = [];
 
-// Handle single tag creation
+// ---------- Create single tag (left manual form) ----------
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tagname'])) {
     global $DB;
     $collectionid = \core_tag_collection::get_default();
     $tagname = trim($_POST['tagname']);
     $description = trim($_POST['tagdesc'] ?? '');
-    
-    if ($tagname) {
+
+    if ($tagname !== '') {
         $existing = \core_tag_tag::get_by_name($collectionid, $tagname);
         if (!$existing) {
-            $tags_created = \core_tag_tag::create_if_missing($collectionid, [$tagname]);
-            if (!empty($tags_created)) {
-                $tag = reset($tags_created);
+            $created = \core_tag_tag::create_if_missing($collectionid, [$tagname]);
+            if (!empty($created)) {
+                $tag = reset($created);
                 if ($description) {
-                    $tagrecord = new stdClass();
-                    $tagrecord->id = $tag->id;
-                    $tagrecord->description = $description;
-                    $tagrecord->timemodified = time();
-                    $DB->update_record('tag', $tagrecord);
+                    $DB->update_record('tag', (object)[
+                        'id' => $tag->id,
+                        'description' => $description,
+                        'timemodified' => time(),
+                    ]);
                 }
-                $uploadresults[] = "<div class='alert alert-success'>Created tag: <strong>$tagname</strong></div>";
+                $uploadresults[] = "<div class='alert alert-success'>Created tag: <strong>" . s($tagname) . "</strong></div>";
             }
         } else {
-            $uploadresults[] = "<div class='alert alert-warning'>Tag already exists: <strong>$tagname</strong></div>";
+            $uploadresults[] = "<div class='alert alert-warning'>Tag already exists: <strong>" . s($tagname) . "</strong></div>";
         }
     }
 }
 
-// Handle file upload
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['tagfile'])) {
-    global $DB;
-    $collectionid = \core_tag_collection::get_default();
-    
-    $csv = fopen($_FILES['tagfile']['tmp_name'], 'r');
-    while (($data = fgetcsv($csv)) !== false) {
-        $tagname = trim($data[0] ?? '');
-        $description = trim($data[1] ?? '');
-    
-        if (!$tagname) continue;
-    
-        $existing = \core_tag_tag::get_by_name($collectionid, $tagname);
-        if (!$existing) {
-            $tags_created = \core_tag_tag::create_if_missing($collectionid, [$tagname]);
-            if (!empty($tags_created)) {
-                $tag = reset($tags_created);
-                if ($description) {
-                    $tagrecord = new stdClass();
-                    $tagrecord->id = $tag->id;
-                    $tagrecord->description = $description;
-                    $tagrecord->timemodified = time();
-                    $DB->update_record('tag', $tagrecord);
+// ---------- Filepicker submit (bulk CSV) ----------
+if ($data = $mform->get_data()) {
+    $draftid = file_get_submitted_draft_itemid('tagfile');
+    file_save_draft_area_files(
+        $draftid,
+        $context->id,
+        'local_tagmanager',
+        'tagcsv',
+        0,
+        ['subdirs' => 0, 'maxfiles' => 1]
+    );
+
+    $fs = get_file_storage();
+    $files = $fs->get_area_files($context->id, 'local_tagmanager', 'tagcsv', 0, 'id', false);
+
+    if (!empty($files)) {
+        $file = reset($files);
+        $content = $file->get_content();
+
+        $fh = fopen('php://temp', 'r+');
+        fwrite($fh, $content);
+        rewind($fh);
+
+        global $DB;
+        $collectionid = \core_tag_collection::get_default();
+
+        while (($row = fgetcsv($fh)) !== false) {
+            $tagname = trim($row[0] ?? '');
+            $desc    = trim($row[1] ?? '');
+            if ($tagname === '') { continue; }
+
+            $existing = \core_tag_tag::get_by_name($collectionid, $tagname);
+            if (!$existing) {
+                $created = \core_tag_tag::create_if_missing($collectionid, [$tagname]);
+                if (!empty($created)) {
+                    $tag = reset($created);
+                    if ($desc) {
+                        $DB->update_record('tag', (object)[
+                            'id' => $tag->id,
+                            'description' => $desc,
+                            'timemodified' => time(),
+                        ]);
+                    }
+                    $uploadresults[] = "<div>Created tag: <strong>" . s($tagname) . "</strong></div>";
                 }
-                $uploadresults[] = "<div>Created tag: <strong>$tagname</strong></div>";
+            } else {
+                $uploadresults[] = "<div class='small'>Tag already exists: <span class='text-muted'>" . s($tagname) . "</span></div>";
             }
-        } else {
-            $uploadresults[] = "<div class='small'>Tag already exists: <span class='text-muted'>$tagname</span></div>";
         }
+        fclose($fh);
+    } else {
+        $uploadresults[] = $OUTPUT->notification('No file saved to file area.', 'notifyproblem');
     }
-    fclose($csv);
 }
 
-// Handle list tags
+// ---------- List tags ----------
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['listtags'])) {
     global $DB;
     $collectionid = \core_tag_collection::get_default();
     $tagrecords = $DB->get_records('tag', ['tagcollid' => $collectionid], 'rawname ASC');
-    
-    foreach ($tagrecords as $tag) {
-        $instancecount = $DB->count_records('tag_instance', ['tagid' => $tag->id]);
+
+    foreach ($tagrecords as $t) {
+        $instancecount = $DB->count_records('tag_instance', ['tagid' => $t->id]);
         $tags[] = [
-            'name' => s($tag->rawname),
-            'id' => s($tag->id),
-            'description' => s($tag->description ?? ''),
+            'name' => s($t->rawname),
+            'id' => s($t->id),
+            'description' => s($t->description ?? ''),
             'instancecount' => $instancecount,
             'candel' => $instancecount == 0
         ];
@@ -115,29 +153,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['listtags'])) {
     $showtags = true;
 }
 
-// Handle tag deletion
+// ---------- Delete tag ----------
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deletetag'])) {
     global $DB;
-    $tagid = intval($_POST['tagid']);
-    
+    $tagid = (int)($_POST['tagid'] ?? 0);
     if ($tagid) {
-        // Check if tag has any instances (items tagged with it)
         $instances = $DB->count_records('tag_instance', ['tagid' => $tagid]);
-        
         if ($instances == 0) {
             $tagname = $DB->get_field('tag', 'rawname', ['id' => $tagid]);
             $DB->delete_records('tag', ['id' => $tagid]);
-            $uploadresults[] = "<div class='alert alert-success'>Deleted unused tag: <strong>$tagname</strong></div>";
+            $uploadresults[] = "<div class='alert alert-success'>Deleted unused tag: <strong>" . s($tagname) . "</strong></div>";
         } else {
-            $uploadresults[] = "<div class='alert alert-danger'>Cannot delete tag - it has $instances tagged items</div>";
+            $uploadresults[] = "<div class='alert alert-danger'>Cannot delete tag - it has " . (int)$instances . " tagged items</div>";
         }
     }
 }
 
-echo $OUTPUT->render_from_template('local_tagbuilder/tagbuilder', [
+// ---------- Render into Mustache (templates/tagmanager.mustache) ----------
+if (method_exists($mform, 'render')) {
+    $formhtml = $mform->render();
+} else {
+    ob_start();
+    $mform->display();
+    $formhtml = ob_get_clean();
+}
+
+echo $OUTPUT->render_from_template('local_tagmanager/tagmanager', [
     'uploadresults' => $uploadresults,
-    'showtags' => $showtags,
-    'tags' => $tags
+    'showtags'      => $showtags,
+    'tags'          => $tags,
+    'formhtml'      => $formhtml,
 ]);
 
 echo $OUTPUT->footer();
