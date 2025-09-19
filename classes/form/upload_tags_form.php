@@ -9,13 +9,22 @@ class upload_tags_form extends \moodleform {
         global $CFG;
         $m = $this->_form;
 
+        // Collapsible section.
         $m->addElement('header', 'hdr', get_string('uploadtags','local_tagmanager'));
-        $m->addElement('filepicker','tagfile',get_string('csvfile','local_tagmanager'),null,[
-            'maxbytes' => $CFG->maxbytes,
+        $m->setExpanded('hdr', true);
+
+        // Filepicker.
+        $m->addElement('filepicker','tagfile', get_string('csvfile','local_tagmanager'), null, [
+            'maxbytes'       => $CFG->maxbytes,
             'accepted_types' => ['.csv'],
-            'subdirs' => 0,
+            'subdirs'        => 0,
         ]);
         $m->addRule('tagfile', null, 'required', null, 'client');
-        $this->add_action_buttons(true, get_string('uploadtags','local_tagmanager'));
+
+        $btns = [];
+        $btns[] = $m->createElement('submit', 'submitbutton', get_string('uploadtags','local_tagmanager'));
+        $btns[] = $m->createElement('cancel', 'cancel', get_string('cancel'));
+        $m->addGroup($btns, 'buttonar', '', ' ', false);
+
     }
 }
