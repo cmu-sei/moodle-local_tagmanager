@@ -1,19 +1,5 @@
 <div class="row">
-    <div class="col-md-6">
-        <form method="POST" class="p-3 border rounded mb-4">
-            <h5>Create Single Tag</h5>
-            <div class="mb-3">
-                <label for="tagname" class="form-label">Tag Name</label>
-                <input type="text" class="form-control" id="tagname" name="tagname" required>
-            </div>
-            <div class="mb-3">
-                <label for="tagdesc" class="form-label">Description (optional)</label>
-                <textarea class="form-control" id="tagdesc" name="tagdesc" rows="2"></textarea>
-            </div>
-            <button type="submit" class="btn btn-success">Create Tag</button>
-        </form>
-    </div>
-    
+<h2>{{#str}} tagmanagertitle, local_tagmanager {{/str}}</h2>
     <div class="col-md-6">
         <!-- moodleform filepicker -->
         {{{formhtml}}}
@@ -21,49 +7,11 @@
     </div>
 </div>
 
-<div class="d-flex gap-2 mb-4">
-    <form method="POST" class="p-3 border rounded">
-        <input type="hidden" name="listtags" value="1">
-        <button type="submit" class="btn btn-secondary">List All Tags</button>
-    </form>
-    
-    <form method="POST" class="p-3 border rounded">
-        <input type="hidden" name="exporttags" value="1">
-        <button type="submit" class="btn btn-info">Export Tags CSV</button>
-    </form>
-</div>
-
 {{#uploadresults}}
 {{{.}}}
 {{/uploadresults}}
 
-{{#showtags}}
-<div class="mt-5">
-    <h3>All Tags in Default Collection</h3>
-    <table class="table table-striped table-bordered table-sm">
-        <thead>
-            <tr><th>Tag Name</th><th>Tag ID</th><th>Description</th><th>Tagged Items</th><th>Action</th></tr>
-        </thead>
-        <tbody>
-            {{#tags}}
-            <tr>
-                <td>{{name}}</td>
-                <td>{{id}}</td>
-                <td>{{description}}</td>
-                <td>{{instancecount}}</td>
-                <td>
-                    {{#candel}}
-                    <form method="POST" style="display:inline;">
-                        <input type="hidden" name="deletetag" value="1">
-                        <input type="hidden" name="tagid" value="{{id}}">
-                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this tag?')">Delete</button>
-                    </form>
-                    {{/candel}}
-                    {{^candel}}-{{/candel}}
-                </td>
-            </tr>
-            {{/tags}}
-        </tbody>
-    </table>
+<h3>{{#str}} tagexporttitle, local_tagmanager {{/str}}</h3>
+<div class="d-flex gap-2 mb-4">
+  <a href="{{exporturl}}" class="btn btn-info">Export Tags CSV</a>
 </div>
-{{/showtags}}
