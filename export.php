@@ -1,22 +1,30 @@
 <?php
-require('../../config.php');
-require_login();
-require_sesskey();
+namespace local_tagmanager\form;
 
-$context = context_system::instance();
-require_capability('local/tagmanager:use', $context);
+defined('MOODLE_INTERNAL') || die();
+require_once($CFG->libdir . '/formslib.php');
 
-global $DB;
-$collectionid = \core_tag_collection::get_default();
-$tags = $DB->get_records('tag', ['tagcollid' => $collectionid], 'rawname ASC');
+class upload_tags_form extends \moodleform {
+    public function definition() {
+        global $CFG;
+        $m = $this->_form;
 
-header('Content-Type: text/csv; charset=utf-8');
-header('Content-Disposition: attachment; filename="tags_export.csv"');
+        // Collapsible section.
+        $m->addElement('header', 'hdr', get_string('uploadtags','local_tagmanager'));
+        $m->setExpanded('hdr', true);
 
-$out = fopen('php://output', 'w');
-fputcsv($out, ['tagname', 'description']);
-foreach ($tags as $t) {
-    fputcsv($out, [$t->rawname, $t->description ?? '']);
+        // Filepicker.
+        $m->addElement('filepicker','tagfile', get_string('csvfile','local_tagmanager'), null, [
+            'maxbytes'       => $CFG->maxbytes,
+            'accepted_types' => ['.csv'],
+            'subdirs'        => 0,
+        ]);
+        $m->addRule('tagfile', null, 'required', null, 'client');
+
+        $btns = [];
+        $btns[] = $m->createElement('submit', 'submitbutton', get_string('uploadtags','local_tagmanager'));
+        $btns[] = $m->createElement('cancel', 'cancel', get_string('cancel'));
+        $m->addGroup($btns, 'buttonar', '', ' ', false);
+
+    }
 }
-fclose($out);
-exit;

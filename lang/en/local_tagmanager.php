@@ -19,3 +19,4 @@ $string['notif_exists_info']= 'Tag already exists: <span class="text-muted">{$a}
 $string['notif_nofile']     = 'No file saved to file area.';
 $string['notif_deleted']    = 'Deleted unused tag: <strong>{$a}</strong>';
 $string['notif_cannotdelete']= 'Cannot delete tag – it has {$a} tagged items.';
+$string['export'] = 'Export';

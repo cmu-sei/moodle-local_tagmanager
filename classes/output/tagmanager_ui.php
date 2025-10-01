@@ -5,6 +5,10 @@ use core\hook\output\before_footer_html_generation as before_footer;
 use moodle_url;
 
 class tagmanager_ui {
+
+    /**
+     * Called from the hook. Renders inline UI on /tag/manage.php.
+     */
     public static function inject(before_footer $hook): void {
         global $PAGE, $OUTPUT, $CFG, $DB;
 
@@ -16,17 +20,19 @@ class tagmanager_ui {
         require_once($CFG->dirroot.'/local/tagmanager/classes/form/upload_tags_form.php');
         $context = \context_system::instance();
 
+        // Prepare form.
         $mform = new \local_tagmanager\form\upload_tags_form();
         $draftid = file_get_submitted_draft_itemid('tagfile');
         file_prepare_draft_area($draftid, $context->id, 'local_tagmanager', 'tagcsv', 0,
             ['subdirs' => 0, 'maxfiles' => 1]);
         $mform->set_data(['tagfile' => $draftid]);
 
+        // State for template.
         $notifications = [];
         $showtags = false;
         $tags = [];
 
-        // ---------- Create single tag (left manual form) ----------
+        // ---- Handle single tag create ----
         if (optional_param('createtag', 0, PARAM_BOOL) && confirm_sesskey()) {
             $collectionid = \core_tag_collection::get_default();
             $tagname = trim(required_param('tagname', PARAM_TEXT));
@@ -55,7 +61,7 @@ class tagmanager_ui {
             }
         }
 
-        // ---------- Filepicker submit (bulk CSV) ----------
+        // ---- Handle CSV upload ----
         if ($data = $mform->get_data()) {
             file_save_draft_area_files($draftid, $context->id, 'local_tagmanager', 'tagcsv', 0,
                 ['subdirs' => 0, 'maxfiles' => 1]);
@@ -135,7 +141,8 @@ class tagmanager_ui {
             }
         }
 
-        // ---------- Render into Mustache (templates/tagmanager.mustache) ----------
+        // ---- Render form ----
+        // ---- Render form ----
         if (method_exists($mform, 'render')) {
             $formhtml = $mform->render();
         } else {
@@ -144,13 +151,16 @@ class tagmanager_ui {
             $formhtml = ob_get_clean();
         }
 
+        // Turn typed notifications into HTML strings the template expects.
         $uploadresults_html = [];
         foreach ($notifications as $n) {
+            // keep it simple; whitelist the bootstrap style suffix
             $type = preg_replace('/[^a-z]/', '', $n['type'] ?? 'info');
             $text = $n['text'] ?? '';
             $uploadresults_html[] = "<div class='alert alert-{$type}'>{$text}</div>";
         }
 
+        // ---- Build template data ----
         $data = [
             'formhtml'      => $formhtml,
             'uploadresults' => $uploadresults_html,
@@ -160,6 +170,7 @@ class tagmanager_ui {
             'sesskey'       => sesskey(),
         ];
 
+        // Inject into hook.
         $hook->add_html($OUTPUT->render_from_template('local_tagmanager/tagmanager', $data));
     }
 }
