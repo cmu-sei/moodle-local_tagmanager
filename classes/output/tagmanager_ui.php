@@ -15,7 +15,6 @@ This Software includes and/or makes use of Third-Party Software each subject to 
 
 DM26-0016
 */
-
 namespace local_tagmanager\output;
 
 use core\hook\output\before_footer_html_generation as before_footer;

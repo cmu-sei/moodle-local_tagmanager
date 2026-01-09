@@ -15,7 +15,6 @@ This Software includes and/or makes use of Third-Party Software each subject to 
 
 DM26-0016
 */
-
 defined('MOODLE_INTERNAL') || die();
 
 $callbacks = [
