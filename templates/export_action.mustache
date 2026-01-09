@@ -14,16 +14,8 @@
 
    DM26-0016
 }}
-
-<div class="row">
-<h2>{{#str}} tagmanagertitle, local_tagmanager {{/str}}</h2>
-    <div class="col-md-6">
-        <!-- moodleform filepicker -->
-        {{{formhtml}}}
-        <!-- end moodleform filepicker -->
-    </div>
-</div>
-
-{{#uploadresults}}
-{{{.}}}
-{{/uploadresults}}
+<a href="{{exporturl}}"
+   class="action-icon export-collection"
+   title="{{#str}} export, local_tagmanager {{/str}}">
+   <i class="icon fa fa-download fa-fw" aria-hidden="true"></i>
+</a>
