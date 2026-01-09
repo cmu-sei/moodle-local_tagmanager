@@ -15,7 +15,6 @@ This Software includes and/or makes use of Third-Party Software each subject to 
 
 DM26-0016
 */
-
 require('../../config.php');
 require_login();
 require_sesskey();
@@ -25,8 +24,10 @@ require_capability('local/tagmanager:use', $context);
 
 global $DB;
 
+// Require collection id.
 $collectionid = required_param('tc', PARAM_INT);
 
+// Validate collection exists.
 if (!$DB->record_exists('tag_coll', ['id' => $collectionid])) {
     print_error('invalidcollection', 'local_tagmanager');
 }
