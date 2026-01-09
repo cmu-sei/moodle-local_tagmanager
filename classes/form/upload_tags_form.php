@@ -26,11 +26,9 @@ class upload_tags_form extends \moodleform {
         global $CFG;
         $m = $this->_form;
 
-        // Collapsible section.
         $m->addElement('header', 'hdr', get_string('uploadtags','local_tagmanager'));
         $m->setExpanded('hdr', true);
 
-        // Filepicker.
         $m->addElement('filepicker','tagfile', get_string('csvfile','local_tagmanager'), null, [
             'maxbytes'       => $CFG->maxbytes,
             'accepted_types' => ['.csv'],

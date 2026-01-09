@@ -15,7 +15,6 @@ This Software includes and/or makes use of Third-Party Software each subject to 
 
 DM26-0016
 */
-
 namespace local_tagmanager;
 
 use core\hook\output\before_footer_html_generation as before_footer;
@@ -25,7 +24,6 @@ class hook_callbacks {
     public static function before_footer_html_generation(before_footer $hook): void {
         global $PAGE;
 
-        // Only on /tag/manage.php (both with or without ?tc).
         $target = new moodle_url('/tag/manage.php');
         if (!$PAGE->url->compare($target, URL_MATCH_BASE)) {
             return;

@@ -15,7 +15,6 @@ This Software includes and/or makes use of Third-Party Software each subject to 
 
 DM26-0016
 */
-
 namespace local_tagmanager\output;
 
 use core\hook\output\before_footer_html_generation as before_footer;
@@ -168,10 +167,8 @@ class tagmanager_ui {
             $formhtml = ob_get_clean();
         }
 
-        // Turn typed notifications into HTML strings the template expects.
         $uploadresults_html = [];
         foreach ($notifications as $n) {
-            // keep it simple; whitelist the bootstrap style suffix
             $type = preg_replace('/[^a-z]/', '', $n['type'] ?? 'info');
             $text = $n['text'] ?? '';
             $uploadresults_html[] = "<div class='alert alert-{$type}'>{$text}</div>";
