@@ -39,6 +39,10 @@ class hook_callbacks {
         if ($tc === null) {
             \local_tagmanager\output\tagmanager_ui::inject($hook);
             $PAGE->requires->js_call_amd('local_tagmanager/exportmenu', 'init');
+        } else {
+            $tc = required_param('tc', PARAM_INT);
+            $PAGE->requires->js_call_amd('local_tagmanager/managecollection', 'init', [$tc]);
         }
+
     }
 }
