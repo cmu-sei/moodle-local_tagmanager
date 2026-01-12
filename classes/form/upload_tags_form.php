@@ -31,6 +31,10 @@ class upload_tags_form extends \moodleform {
 
         $fixedcollid = $this->_customdata['fixedcollid'] ?? null;
 
+        // Collapsible section.
+        $m->addElement('header', 'hdr', get_string('uploadtags','local_tagmanager'));
+        $m->setExpanded('hdr', true);
+
         if ($fixedcollid) {
             $m->addElement('hidden', 'tc', $fixedcollid);
             $m->setType('tc', PARAM_INT);
@@ -42,10 +46,6 @@ class upload_tags_form extends \moodleform {
             $m->setType('tagcollid', PARAM_INT);
             $m->setDefault('tagcollid', $defaultcoll);
         }
-
-        // Collapsible section.
-        $m->addElement('header', 'hdr', get_string('uploadtags','local_tagmanager'));
-        $m->setExpanded('hdr', true);
 
         // Filepicker.
         $m->addElement('filepicker','tagfile', get_string('csvfile','local_tagmanager'), null, [
