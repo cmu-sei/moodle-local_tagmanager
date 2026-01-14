@@ -34,6 +34,12 @@ This Software includes and/or makes use of Third-Party Software each subject to 
 DM26-0016
 */
 
+/**
+ * Moodle form to upload csv file container tags to be imported by the Tag Manager Plugin.
+ * @package    local_tagmanager
+ * @copyright  2026 Carnegie Mellon University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 namespace local_tagmanager\form;
 
 defined('MOODLE_INTERNAL') || die();
