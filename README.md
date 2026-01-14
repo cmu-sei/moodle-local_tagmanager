@@ -42,7 +42,7 @@ N/A
 
 ### UI Location
 
-The functionlaity of the tag management page has been extended by this plugin.
+The functionality of the tag management page has been extended by this plugin.
 
 > **Site administration → Appearance → Manage Tags**
 
@@ -54,7 +54,7 @@ The actions column of the table has been extended to include a download icon tha
 
 ### Importing tag collections
 
-On the tag managemet page there is now an upload form on the bottom of the page. This form uses the Moodle file manager to upload a csv file to a collection.
+On the tag management page there is now an upload form on the bottom of the page. This form uses the Moodle file manager to upload a csv file to a collection.
 
 TODO document whether it overwrites.
 
