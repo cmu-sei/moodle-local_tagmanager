@@ -14,20 +14,20 @@
 
 A lightweight Moodle admin plugin for managing tags in bulk. Supports uploading tags with descriptions, exporting all existing tags, and listing tag metadata in a clean, Bootstrap-styled interface.
 
----
-
 ## Features
 
-- 📥 **Upload Tags from CSV**
+- **Upload Tags from CSV**
   - Format: `tagname,description`
   - Creates new tags (ignores duplicates)
   - Supports optional descriptions
 
-- 📄 **List All Tags**
+- **List All Tags**
   - Displays tag name, ID, and description
   - Styled using Moodle’s standard `html_table` API
 
 ## Requirements
+
+N/A
 
 ## Installation
 
@@ -35,6 +35,8 @@ A lightweight Moodle admin plugin for managing tags in bulk. Supports uploading 
 2. Navigate to **Appearance → Tag Manager** to start using it
 
 ## Configuration
+
+N/A
 
 ## Usage
 
@@ -49,7 +51,6 @@ Or go directly to: `/tag/manage.php`
 ### Exporting tag collections
 
 The actions column of the table has been extended to include a download icon that enables the user to export a csv file containing the tags within each collection.
----
 
 ### Importing tag collections
 
@@ -71,7 +72,6 @@ compliance,For governance or regulatory content
 - Description is optional
 - Duplicate tag names are skipped
 
-
 ### Future Ideas
 
 - Bulk delete or merge tags
@@ -81,13 +81,14 @@ compliance,For governance or regulatory content
 
 ## License
 
-Local Tag Manager Plugin
+Tag Manager Plugin for Moodle
 
 Copyright 2026 Carnegie Mellon University.
 
 NO WARRANTY. THIS CARNEGIE MELLON UNIVERSITY AND SOFTWARE ENGINEERING INSTITUTE MATERIAL IS FURNISHED ON AN "AS-IS" BASIS.
-CARNEGIE MELLON UNIVERSITY MAKES NO WARRANTIES OF ANY KIND, EITHER EXPRESSED OR IMPLIED, AS TO ANY MATTER INCLUDING, BUT NOT LIMITED TO, WARRANTY OF FITNESS FOR PURPOSE OR MERCHANTABILITY, EXCLUSIVITY, OR RESULTS OBTAINED FROM USE OF THE MATERIAL.
-CARNEGIE MELLON UNIVERSITY DOES NOT MAKE ANY WARRANTY OF ANY KIND WITH RESPECT TO FREEDOM FROM PATENT, TRADEMARK, OR COPYRIGHT INFRINGEMENT.
+CARNEGIE MELLON UNIVERSITY MAKES NO WARRANTIES OF ANY KIND, EITHER EXPRESSED OR IMPLIED, AS TO ANY MATTER INCLUDING, BUT NOT LIMITED TO,
+WARRANTY OF FITNESS FOR PURPOSE OR MERCHANTABILITY, EXCLUSIVITY, OR RESULTS OBTAINED FROM USE OF THE MATERIAL. CARNEGIE MELLON UNIVERSITY
+DOES NOT MAKE ANY WARRANTY OF ANY KIND WITH RESPECT TO FREEDOM FROM PATENT, TRADEMARK, OR COPYRIGHT INFRINGEMENT.
 
 Licensed under a GNU GENERAL PUBLIC LICENSE - Version 3, 29 June 2007-style license, please see license.txt or contact permission@sei.cmu.edu for full terms.
 
