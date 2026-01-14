@@ -12,7 +12,7 @@
 
 ## Description
 
-A lightweight Moodle admin plugin for managing tags in bulk. Supports uploading tags with descriptions, exporting all existing tags, and listing tag metadata in a clean, Bootstrap-styled interface.
+A lightweight Moodle plugin for managing tags in bulk. Supports uploading tags with descriptions, exporting all existing tags, and listing tag metadata in a clean, Bootstrap-styled interface.
 
 ## Features
 
