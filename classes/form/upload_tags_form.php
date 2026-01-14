@@ -26,9 +26,26 @@ class upload_tags_form extends \moodleform {
         global $CFG;
         $m = $this->_form;
 
+        $collections = $this->_customdata['collections'] ?? [];
+        $defaultcoll = $this->_customdata['defaultcoll'] ?? \core_tag_collection::get_default();
+
+        $fixedcollid = $this->_customdata['fixedcollid'] ?? null;
+
         // Collapsible section.
         $m->addElement('header', 'hdr', get_string('uploadtags','local_tagmanager'));
         $m->setExpanded('hdr', true);
+
+        if ($fixedcollid) {
+            $m->addElement('hidden', 'tc', $fixedcollid);
+            $m->setType('tc', PARAM_INT);
+            $m->addElement('hidden', 'tagcollid', (int)$fixedcollid);
+            $m->setType('tagcollid', PARAM_INT);
+        } else {
+            $m->addElement('select', 'tagcollid', get_string('tagcollection', 'local_tagmanager'), $collections);
+            $m->addRule('tagcollid', null, 'required', null, 'client');
+            $m->setType('tagcollid', PARAM_INT);
+            $m->setDefault('tagcollid', $defaultcoll);
+        }
 
         // Filepicker.
         $m->addElement('filepicker','tagfile', get_string('csvfile','local_tagmanager'), null, [
@@ -43,5 +60,19 @@ class upload_tags_form extends \moodleform {
         $btns[] = $m->createElement('cancel', 'cancel', get_string('cancel'));
         $m->addGroup($btns, 'buttonar', '', ' ', false);
 
+    }
+
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+        $fixedcollid = $this->_customdata['fixedcollid'] ?? null;
+
+        if (!$fixedcollid) {
+            $collections = $this->_customdata['collections'] ?? [];
+            if (empty($data['tagcollid']) || !array_key_exists((int)$data['tagcollid'], $collections)) {
+                $errors['tagcollid'] = get_string('invalidcollection', 'local_tagmanager');
+            }
+        }
+
+        return $errors;
     }
 }

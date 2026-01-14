@@ -36,28 +36,59 @@ class tagmanager_ui {
         require_once($CFG->dirroot.'/local/tagmanager/classes/form/upload_tags_form.php');
         $context = \context_system::instance();
 
-        // Prepare form.
-        $mform = new \local_tagmanager\form\upload_tags_form();
+        // Build dropdown options
+        $collectionrecords = $DB->get_records('tag_coll', null, 'sortorder ASC, id ASC', 'id,name,isdefault');
+
+        $collectionmenu = [0 => get_string('choose', 'moodle')];
+        foreach ($collectionrecords as $c) {
+            $name = trim((string)($c->name ?? ''));
+
+            if ($name === '' && (int)$c->isdefault === 1) {
+                $name = get_string('defaultcollectionname', 'local_tagmanager');
+            } elseif ($name === '') {
+                $name = 'Collection ' . $c->id;
+            }
+
+            $collectionmenu[(int)$c->id] = format_string($name);
+        }
+
+        $defaultcoll = \core_tag_collection::get_default();
+
+        $mform = new \local_tagmanager\form\upload_tags_form(null, [
+            'collections' => $collectionmenu,
+            'defaultcoll' => $defaultcoll,
+        ]);
+
         $draftid = file_get_submitted_draft_itemid('tagfile');
         file_prepare_draft_area($draftid, $context->id, 'local_tagmanager', 'tagcsv', 0,
             ['subdirs' => 0, 'maxfiles' => 1]);
-        $mform->set_data(['tagfile' => $draftid]);
 
-        // State for template.
+        $selectedcoll = optional_param('tagcollid', $defaultcoll, PARAM_INT);
+
+        if (empty($selectedcoll) || !$DB->record_exists('tag_coll', ['id' => $selectedcoll])) {
+            $selectedcoll = $defaultcoll;
+        }
+
+        $selectedlabel = $collectionmenu[$selectedcoll] ?? ('Collection ' . $selectedcoll);
+
+        $mform->set_data([
+            'tagfile'   => $draftid,
+            'tagcollid' => $selectedcoll,
+        ]);
         $notifications = [];
         $showtags = false;
         $tags = [];
 
         // ---- Handle single tag create ----
         if (optional_param('createtag', 0, PARAM_BOOL) && confirm_sesskey()) {
-            $collectionid = \core_tag_collection::get_default();
             $tagname = trim(required_param('tagname', PARAM_TEXT));
             $description = trim(optional_param('tagdesc', '', PARAM_RAW_TRIMMED));
+            $colinfo = get_string('tagcollection', 'local_tagmanager') . ':  <strong>' . $selectedlabel . '</strong>';
 
             if ($tagname !== '') {
-                $existing = \core_tag_tag::get_by_name($collectionid, $tagname);
+                $existing = \core_tag_tag::get_by_name($selectedcoll, $tagname);
                 if (!$existing) {
-                    $created = \core_tag_tag::create_if_missing($collectionid, [$tagname]);
+                    $created = \core_tag_tag::create_if_missing($selectedcoll, [$tagname]);
                     if (!empty($created)) {
                         $tag = reset($created);
                         if ($description) {
@@ -67,12 +98,17 @@ class tagmanager_ui {
                                 'timemodified' => time(),
                             ]);
                         }
-                        $notifications[] = ['type' => 'success',
-                            'text' => get_string('notif_created', 'local_tagmanager', $tagname)];
+
+                        $notifications[] = [
+                            'type' => 'success',
+                            'text' => get_string('notif_created', 'local_tagmanager', $tagname) . $colinfo
+                        ];
                     }
                 } else {
-                    $notifications[] = ['type' => 'warning',
-                        'text' => get_string('notif_exists', 'local_tagmanager', $tagname)];
+                    $notifications[] = [
+                        'type' => 'warning',
+                        'text' => get_string('notif_exists', 'local_tagmanager', $tagname) . $colinfo
+                    ];
                 }
             }
         }
@@ -91,15 +127,42 @@ class tagmanager_ui {
                 fwrite($fh, $file->get_content());
                 rewind($fh);
 
-                $collectionid = \core_tag_collection::get_default();
+                $uploadcoll = (int)$data->tagcollid;
+                if (empty($uploadcoll) || !$DB->record_exists('tag_coll', ['id' => $uploadcoll])) {
+                    print_error('invalidcollection', 'local_tagmanager');
+                }
+                $uploadlabel = $collectionmenu[$uploadcoll] ?? ('Collection ' . $uploadcoll);
+                $colinfo = get_string('tagcollection', 'local_tagmanager') . ':  <strong>' . $uploadlabel . '</strong>';
+
+
+                $firstrow = true;
+
                 while (($row = fgetcsv($fh)) !== false) {
                     $tagname = trim($row[0] ?? '');
                     $desc    = trim($row[1] ?? '');
-                    if ($tagname === '') { continue; }
 
-                    $existing = \core_tag_tag::get_by_name($collectionid, $tagname);
+                    // Skip a header row
+                    if ($firstrow) {
+                        $firstrow = false;
+
+                        $h1 = \core_text::strtolower(trim($tagname));
+                        $h2 = \core_text::strtolower(trim($desc));
+
+                        $headernames = ['tagname', 'tag name', 'name'];
+                        $headerdescs = ['description', 'tag description', 'desc', ''];
+
+                        if (in_array($h1, $headernames, true) && in_array($h2, $headerdescs, true)) {
+                            continue;
+                        }
+                    }
+
+                    if ($tagname === '') {
+                        continue;
+                    }
+
+                    $existing = \core_tag_tag::get_by_name($uploadcoll, $tagname);
                     if (!$existing) {
-                        $created = \core_tag_tag::create_if_missing($collectionid, [$tagname]);
+                        $created = \core_tag_tag::create_if_missing($uploadcoll, [$tagname]);
                         if (!empty($created)) {
                             $tag = reset($created);
                             if ($desc) {
@@ -109,14 +172,19 @@ class tagmanager_ui {
                                     'timemodified' => time(),
                                 ]);
                             }
-                            $notifications[] = ['type' => 'success',
-                                'text' => get_string('notif_created', 'local_tagmanager', $tagname)];
+                            $notifications[] = [
+                                'type' => 'success',
+                                'text' => get_string('notif_created', 'local_tagmanager', $tagname) . $colinfo
+                            ];
                         }
                     } else {
-                        $notifications[] = ['type' => 'info',
-                            'text' => get_string('notif_exists_info', 'local_tagmanager', $tagname)];
+                        $notifications[] = [
+                            'type' => 'info',
+                            'text' => get_string('notif_exists_info', 'local_tagmanager', $tagname) . $colinfo
+                        ];
                     }
                 }
+
                 fclose($fh);
             } else {
                 $notifications[] = ['type' => 'danger',
@@ -126,8 +194,7 @@ class tagmanager_ui {
 
         // ---- List tags ----
         if (optional_param('listtags', 0, PARAM_BOOL) && confirm_sesskey()) {
-            $collectionid = \core_tag_collection::get_default();
-            $tagrecords = $DB->get_records('tag', ['tagcollid' => $collectionid], 'rawname ASC');
+            $tagrecords = $DB->get_records('tag', ['tagcollid' => $selectedcoll], 'rawname ASC');
 
             foreach ($tagrecords as $t) {
                 $instancecount = $DB->count_records('tag_instance', ['tagid' => $t->id]);
@@ -158,7 +225,6 @@ class tagmanager_ui {
         }
 
         // ---- Render form ----
-        // ---- Render form ----
         if (method_exists($mform, 'render')) {
             $formhtml = $mform->render();
         } else {
@@ -167,26 +233,40 @@ class tagmanager_ui {
             $formhtml = ob_get_clean();
         }
 
-        // Turn typed notifications into HTML strings the template expects.
-        $uploadresults_html = [];
         foreach ($notifications as $n) {
-            // keep it simple; whitelist the bootstrap style suffix
             $type = preg_replace('/[^a-z]/', '', $n['type'] ?? 'info');
             $text = $n['text'] ?? '';
-            $uploadresults_html[] = "<div class='alert alert-{$type}'>{$text}</div>";
+
+            switch ($type) {
+                case 'success':
+                    \core\notification::add($text, \core\notification::SUCCESS);
+                    break;
+                case 'warning':
+                    \core\notification::add($text, \core\notification::WARNING);
+                    break;
+                case 'danger':
+                case 'error':
+                    \core\notification::add($text, \core\notification::ERROR);
+                    break;
+                case 'info':
+                default:
+                    \core\notification::add($text, \core\notification::INFO);
+                    break;
+            }
         }
 
         // ---- Build template data ----
         $data = [
             'formhtml'      => $formhtml,
-            'uploadresults' => $uploadresults_html,
             'showtags'      => $showtags,
             'tags'          => $tags,
-            'exporturl'     => (new moodle_url('/local/tagmanager/export.php', ['sesskey'=>sesskey()]))->out(false),
+            'exporturl' => (new moodle_url('/local/tagmanager/export.php', [
+                'sesskey' => sesskey(),
+                'tc' => $selectedcoll,
+            ]))->out(false),
             'sesskey'       => sesskey(),
         ];
 
-        // Inject into hook.
         $hook->add_html($OUTPUT->render_from_template('local_tagmanager/tagmanager', $data));
     }
 }
