@@ -12,7 +12,7 @@
 
 ## Description
 
-A lightweight Moodle plugin for managing tags in bulk. Supports uploading tags with descriptions, exporting all existing tags, and listing tag metadata in a clean, Bootstrap-styled interface.
+A lightweight Moodle plugin for managing tags in bulk. Supports uploading tags with descriptions and exporting tags to CSV files.
 
 ## Features
 
@@ -21,18 +21,18 @@ A lightweight Moodle plugin for managing tags in bulk. Supports uploading tags w
   - Creates new tags (ignores duplicates)
   - Supports optional descriptions
 
-- **List All Tags**
-  - Displays tag name, ID, and description
-  - Styled using Moodle’s standard `html_table` API
+- **Export Tags to CSV**
+  - Export all tags in a collection or selected tags
+  - Includes tag names and descriptions
 
 ## Requirements
 
-N/A
+Moodle 4.0 or later (requires: 2022041900)
 
 ## Installation
 
 1. Drop this folder into `local/tagmanager`
-2. Navigate to **Appearance → Tag Manager** to start using it
+2. Navigate to **Appearance → Manage Tags** to start using it
 
 ## Configuration
 
@@ -42,7 +42,7 @@ N/A
 
 ### UI Location
 
-The functionality of the tag management page has been extended by this plugin.
+The functionality of the tag management page has been extended by this plugin. It adds an upload form to that main page, and also inserts a button in each collection's edit page that allows import.
 
 > **Site administration → Appearance → Manage Tags**
 
@@ -54,9 +54,11 @@ The actions column of the table has been extended to include a download icon tha
 
 ### Importing tag collections
 
-On the tag management page there is now an upload form on the bottom of the page. This form uses the Moodle file manager to upload a csv file to a collection.
+On the tag management page there is now a Tag Manager section with an upload form on the bottom of the page. This form uses the Moodle file manager to upload a csv file to an existing tag collection.
 
-TODO document whether it overwrites.
+Inside each collection's edit page, there is now a button that allows the user to "Import standard tags". This will take the user to a new page that also renders a form that uses the Moodle file manager to upload a csv file.
+
+Existing tags will not be overwritten.
 
 ### CSV Format for Uploading tag collections
 

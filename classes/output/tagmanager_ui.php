@@ -101,8 +101,6 @@ class tagmanager_ui {
             'tagcollid' => $selectedcoll,
         ]);
         $notifications = [];
-        $showtags = false;
-        $tags = [];
 
         // ---- Handle single tag create ----
         if (optional_param('createtag', 0, PARAM_BOOL) && confirm_sesskey()) {
@@ -217,38 +215,6 @@ class tagmanager_ui {
             }
         }
 
-        // ---- List tags ----
-        if (optional_param('listtags', 0, PARAM_BOOL) && confirm_sesskey()) {
-            $tagrecords = $DB->get_records('tag', ['tagcollid' => $selectedcoll], 'rawname ASC');
-
-            foreach ($tagrecords as $t) {
-                $instancecount = $DB->count_records('tag_instance', ['tagid' => $t->id]);
-                $tags[] = [
-                    'id' => (int)$t->id,
-                    'name' => s($t->rawname),
-                    'description' => s($t->description ?? ''),
-                    'instancecount' => $instancecount,
-                    'candel' => $instancecount == 0,
-                ];
-            }
-            $showtags = true;
-        }
-
-        // ---- Delete tag ----
-        if (optional_param('deletetag', 0, PARAM_BOOL) && confirm_sesskey()) {
-            $tagid = required_param('tagid', PARAM_INT);
-            $instances = $DB->count_records('tag_instance', ['tagid' => $tagid]);
-            if ($instances == 0) {
-                $tagname = $DB->get_field('tag', 'rawname', ['id' => $tagid]);
-                $DB->delete_records('tag', ['id' => $tagid]);
-                $notifications[] = ['type' => 'success',
-                    'text' => get_string('notif_deleted', 'local_tagmanager', $tagname)];
-            } else {
-                $notifications[] = ['type' => 'danger',
-                    'text' => get_string('notif_cannotdelete', 'local_tagmanager', $instances)];
-            }
-        }
-
         // ---- Render form ----
         if (method_exists($mform, 'render')) {
             $formhtml = $mform->render();
@@ -283,8 +249,6 @@ class tagmanager_ui {
         // ---- Build template data ----
         $data = [
             'formhtml'      => $formhtml,
-            'showtags'      => $showtags,
-            'tags'          => $tags,
             'exporturl' => (new moodle_url('/local/tagmanager/export.php', [
                 'sesskey' => sesskey(),
                 'tc' => $selectedcoll,
