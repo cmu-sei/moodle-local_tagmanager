@@ -50,15 +50,26 @@ Or go directly to: `/tag/manage.php`
 
 ### Exporting tag collections
 
-The actions column of the table has been extended to include a download icon that enables the user to export a csv file containing the tags within each collection.
+The actions column of the collections table includes a download icon (⬇) for each collection. Click it to export a CSV file containing all tags in that collection.
+
+On a collection's edit page, you can also export selected tags using the "Export selected" button.
 
 ### Importing tag collections
 
-On the tag management page there is now a Tag Manager section with an upload form on the bottom of the page. This form uses the Moodle file manager to upload a csv file to an existing tag collection.
+**From the main tag management page:**
+- Each collection row has an import icon (⬆) in the actions column
+- Click the import icon to go to the import page for that collection
 
-Inside each collection's edit page, there is now a button that allows the user to "Import standard tags". This will take the user to a new page that also renders a form that uses the Moodle file manager to upload a csv file.
+**From a collection's edit page:**
+- Click the "Import standard tags" button at the top
+- This takes you to the same import page
 
-Existing tags will not be overwritten.
+**On the import page:**
+- Use the file picker to select your CSV file
+- Click "Upload tags" to import
+- The page will redirect back to the tag management page with success/info messages
+
+**Important:** Existing tags will not be overwritten. Duplicate tag names are skipped.
 
 ### CSV Format for Uploading tag collections
 

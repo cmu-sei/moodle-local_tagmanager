@@ -36,12 +36,12 @@ define(['jquery', 'core/templates'], function($, Templates) {
     return {
         init: function() {
             $(document).ready(function() {
-                // Collections table case: add Export per row.
+                // Collections table case: add Import and Export buttons per row.
                 $('.tag-collections-table tbody tr').each(function() {
                     var row = $(this);
 
-                    // Skip if export already present.
-                    if (row.find('.export-collection').length) {
+                    // Skip if already processed.
+                    if (row.find('.export-collection, .import-collection').length) {
                         return;
                     }
 
@@ -51,7 +51,7 @@ define(['jquery', 'core/templates'], function($, Templates) {
                         return;
                     }
 
-                    // Extract tc from the link in the name column (safer for both default & others).
+                    // Extract tc from the link in the name column.
                     var tcLink = row.find('td.c0 a[href*="manage.php?tc="]');
                     if (!tcLink.length) {
                         return;
@@ -64,12 +64,22 @@ define(['jquery', 'core/templates'], function($, Templates) {
 
                     var sesskey = M.cfg.sesskey;
                     var exportUrl = M.cfg.wwwroot + '/local/tagmanager/export.php?tc=' + tc + '&sesskey=' + sesskey;
+                    var importUrl = M.cfg.wwwroot + '/local/tagmanager/import.php?tc=' + tc;
 
-                    // Render and insert Export icon at the end of the action cell.
+                    // Add Import button (matching the action-icon style of other icons).
+                    var importBtn = $('<a/>', {
+                        href: importUrl,
+                        class: 'action-icon import-collection',
+                        title: 'Import tags',
+                        html: '<i class="icon fa fa-upload fa-fw " title="Import tags" role="img" aria-label="Import tags"></i>'
+                    });
+                    actionCell.append(importBtn);
+
+                    // Render and insert Export icon.
                     Templates.render('local_tagmanager/export_action', {
                         exporturl: exportUrl
                     }).done(function(html, js) {
-                        actionCell.append(html); // for default this will be the only icon
+                        actionCell.append(html);
                         Templates.runTemplateJS(js);
                     }).fail(function(ex) {
                         console.error('Failed to render export link', ex);
