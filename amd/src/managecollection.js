@@ -35,7 +35,11 @@ DM26-0016
 define(['jquery', 'core/str', 'core/notification'], function($, Str, Notification) {
 
     function getSelectedIds() {
-        const ids = $('[data-region="reportbuilder-table"] input[name="report-select-row[]"][data-toggle="slave"]:checked')
+        // Matched on the name alone: Moodle 5.2 renamed the value of data-toggle on these
+        // checkboxes from "slave" to "target", so pinning either one loses the selection on
+        // half the versions this plugin supports. The select-all checkbox shares the name but
+        // carries an empty value, which the numeric filter below drops.
+        const ids = $('[data-region="reportbuilder-table"] input[name="report-select-row[]"]:checked')
             .map(function() { return ($(this).val() || '').toString().trim(); })
             .get()
             .filter(v => /^\d+$/.test(v));
