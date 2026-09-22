@@ -49,4 +49,23 @@ final class lang_strings_test extends \basic_testcase {
         $this->assertIsString($s);
         $this->assertNotSame('[[pluginname]]', $s);
     }
+
+    public function test_import_notification_strings(): void {
+        // import.php used to build these notifications from English literals, so the strings
+        // were never rendered and their trailing " in " was never noticed.
+        $this->assertSame(
+            'Created tag: <strong>tag-one</strong>',
+            get_string('notif_created', 'local_tagmanager', 'tag-one')
+        );
+        $this->assertSame(
+            'Tag already exists: <strong>tag-one</strong>',
+            get_string('notif_exists', 'local_tagmanager', 'tag-one')
+        );
+        $this->assertSame('(+3 more)', get_string('notif_more', 'local_tagmanager', 3));
+        $this->assertSame(
+            'Imported: 2. Already existed: 1.',
+            get_string('notif_summary', 'local_tagmanager', ['created' => 2, 'existed' => 1])
+        );
+        $this->assertSame('No tags imported.', get_string('notif_none', 'local_tagmanager'));
+    }
 }

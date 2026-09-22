@@ -181,7 +181,7 @@ if ($data = $mform->get_data()) {
             $text = implode(', ', $safe);
             $hidden = $total - count($names);
             if ($hidden > 0) {
-                $text .= ' (+' . $hidden . ' more)';
+                $text .= ' ' . get_string('notif_more', 'local_tagmanager', $hidden);
             }
             return $text;
         };
@@ -194,15 +194,15 @@ if ($data = $mform->get_data()) {
         $warnmsg = '';
 
         if ($successcount) {
-            $successmsg = 'Created tag: <strong>' . $importedlist . '</strong>';
+            $successmsg = get_string('notif_created', 'local_tagmanager', $importedlist);
         }
 
         if ($existscount) {
-            $warnmsg = 'Tag already exists: <strong>' . $existinglist . '</strong>';
+            $warnmsg = get_string('notif_exists', 'local_tagmanager', $existinglist);
         }
 
         if (!$successcount && !$existscount) {
-            \core\notification::add('No tags imported.', \core\notification::INFO);
+            \core\notification::add(get_string('notif_none', 'local_tagmanager'), \core\notification::INFO);
         } else {
             if ($successmsg !== '') {
                 \core\notification::add($successmsg, \core\notification::SUCCESS);
@@ -223,7 +223,11 @@ echo $OUTPUT->header();
 if ($error) {
     echo $OUTPUT->notification($error, \core\output\notification::NOTIFY_ERROR);
 } else if ($didprocess) {
-    echo $OUTPUT->notification("Imported: {$successcount}. Already existed: {$existscount}.", \core\output\notification::NOTIFY_SUCCESS);
+    $summary = get_string('notif_summary', 'local_tagmanager', [
+        'created' => $successcount,
+        'existed' => $existscount,
+    ]);
+    echo $OUTPUT->notification($summary, \core\output\notification::NOTIFY_SUCCESS);
 }
 
 $mform->display();
