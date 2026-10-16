@@ -56,7 +56,7 @@ $tagids = optional_param('tagids', '', PARAM_SEQUENCE);
 
 // Validate collection exists.
 if (!$DB->record_exists('tag_coll', ['id' => $collectionid])) {
-    print_error('invalidcollection', 'local_tagmanager');
+    throw new moodle_exception('invalidcollection', 'local_tagmanager');
 }
 
 $collection = $DB->get_record('tag_coll', ['id' => $collectionid], 'id,name,isdefault', MUST_EXIST);
