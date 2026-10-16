@@ -115,10 +115,14 @@ define(['jquery', 'core/str', 'core/notification'], function($, Str, Notificatio
         const $btn = $('<button/>', {
             type: 'button',
             class: 'btn btn-primary local-tagmanager-importstandard',
-            html: '<i class="icon fa fa-plus fa-fw" aria-hidden="true"></i> Import standard tags'
+            html: '<i class="icon fa fa-plus fa-fw" aria-hidden="true"></i> '
         });
 
         $right.append($btn);
+        Str.get_string('importstandardtags', 'local_tagmanager').then(function(label) {
+            $btn.append(document.createTextNode(label));
+            return label;
+        }).catch(Notification.exception);
 
         $btn.on('click', function() {
             window.location.href =
