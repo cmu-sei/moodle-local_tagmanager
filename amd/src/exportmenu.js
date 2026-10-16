@@ -32,7 +32,7 @@ This Software includes and/or makes use of Third-Party Software each subject to 
 
 DM26-0016
 */
-define(['jquery', 'core/templates'], function($, Templates) {
+define(['jquery', 'core/templates', 'core/str', 'core/notification'], function($, Templates, Str, Notification) {
     return {
         init: function() {
             $(document).ready(function() {
@@ -69,11 +69,19 @@ define(['jquery', 'core/templates'], function($, Templates) {
                     // Add Import button (matching the action-icon style of other icons).
                     var importBtn = $('<a/>', {
                         href: importUrl,
-                        class: 'action-icon import-collection',
-                        title: 'Import tags',
-                        html: '<i class="icon fa fa-upload fa-fw " title="Import tags" role="img" aria-label="Import tags"></i>'
+                        class: 'action-icon import-collection'
                     });
+                    var importIcon = $('<i/>', {
+                        class: 'icon fa fa-upload fa-fw ',
+                        role: 'img'
+                    });
+                    importBtn.append(importIcon);
                     actionCell.append(importBtn);
+                    Str.get_string('importtags', 'local_tagmanager').then(function(label) {
+                        importBtn.attr('title', label);
+                        importIcon.attr({title: label, 'aria-label': label});
+                        return label;
+                    }).catch(Notification.exception);
 
                     // Render and insert Export icon.
                     Templates.render('local_tagmanager/export_action', {

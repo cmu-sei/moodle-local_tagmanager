@@ -56,7 +56,7 @@ $PAGE->set_heading(get_string('importtags', 'local_tagmanager'));
 global $DB, $OUTPUT, $CFG;
 
 if (!$DB->record_exists('tag_coll', ['id' => $tc])) {
-    print_error('invalidcollection', 'local_tagmanager');
+    throw new moodle_exception('invalidcollection', 'local_tagmanager');
 }
 
 require_once($CFG->dirroot.'/local/tagmanager/classes/form/upload_tags_form.php');
@@ -118,7 +118,7 @@ if ($data = $mform->get_data()) {
 
         $firstrow = true;
 
-        while (($row = fgetcsv($fh)) !== false) {
+        while (($row = fgetcsv($fh, null, ',', '"', '\\')) !== false) {
             $tagname = trim($row[0] ?? '');
             $desc    = trim($row[1] ?? '');
 
