@@ -52,3 +52,16 @@ Feature: Tag Manager adds import and export controls to Manage tags
     And "Add standard tags" "button" should exist
     And "Export selected" "button" should not exist
     And "Import standard tags" "button" should not exist
+
+  @_file_upload
+  Scenario: Importing a CSV creates the new tags and reports the ones that already exist
+    Given I log in as "admin"
+    And I navigate to "Appearance > Manage tags" in site administration
+    And I follow "Default collection"
+    And I press "Import standard tags"
+    When I upload "local/tagmanager/tests/fixtures/tags.csv" file to "CSV file" filemanager
+    And I press "Upload Tag File"
+    Then I should see "Created tag: Alpha, Beta"
+    And I should see "Tag already exists: Existing"
+    And I should see "Alpha" in the "reportbuilder-table" "table"
+    And I should see "Beta" in the "reportbuilder-table" "table"
