@@ -60,7 +60,8 @@ Feature: Tag Manager adds import and export controls to Manage tags
     And I follow "Default collection"
     And I press "Import standard tags"
     When I upload "local/tagmanager/tests/fixtures/tags.csv" file to "CSV file" filemanager
-    And I press "Upload Tag File"
+    # The form header shares the button label, so "I press" would hit the header toggle.
+    And I click on "#id_submitbutton" "css_element"
     Then I should see "Created tag: Alpha, Beta"
     And I should see "Tag already exists: Existing"
     And I should see "Alpha" in the "reportbuilder-table" "table"
