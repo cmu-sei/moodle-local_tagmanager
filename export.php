@@ -88,7 +88,7 @@ $disposition .= "; filename*=UTF-8''" . rawurlencode($filename);
 header('Content-Disposition: ' . $disposition);
 
 $out = fopen('php://output', 'w');
-fputcsv($out, ['tagname', 'description']);
+fputcsv($out, ['tagname', 'description'], ',', '"', '\\');
 if ($tagids !== '') {
     // Export only selected tags
     $ids = array_filter(array_map('intval', explode(',', $tagids)));
@@ -106,14 +106,14 @@ if ($tagids !== '') {
         $tags = $DB->get_records_sql($sql, $params);
 
         foreach ($tags as $t) {
-            fputcsv($out, [$t->rawname, $t->description ?? '']);
+            fputcsv($out, [$t->rawname, $t->description ?? ''], ',', '"', '\\');
         }
     }
 } else {
     // Export all tags in collection
     $tags = $DB->get_records('tag', ['tagcollid' => $collectionid], 'rawname ASC', 'id,rawname,description');
     foreach ($tags as $t) {
-        fputcsv($out, [$t->rawname, $t->description ?? '']);
+        fputcsv($out, [$t->rawname, $t->description ?? ''], ',', '"', '\\');
     }
 }
 fclose($out);

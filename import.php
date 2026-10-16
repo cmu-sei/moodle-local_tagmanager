@@ -118,7 +118,7 @@ if ($data = $mform->get_data()) {
 
         $firstrow = true;
 
-        while (($row = fgetcsv($fh)) !== false) {
+        while (($row = fgetcsv($fh, null, ',', '"', '\\')) !== false) {
             $tagname = trim($row[0] ?? '');
             $desc    = trim($row[1] ?? '');
 
