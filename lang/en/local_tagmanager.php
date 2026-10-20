@@ -71,3 +71,4 @@ $string['exportselected'] = 'Export selected';
 $string['exportselectednone'] = 'Please select at least one tag to export.';
 $string['importtags'] = 'Import tags';
 $string['importstandardtags'] = 'Import standard tags';
+$string['privacy:metadata'] = 'The Tag Manager plugin does not store any personal data. Uploaded CSV files are processed and discarded; imported tags are stored by the core tag subsystem.';
