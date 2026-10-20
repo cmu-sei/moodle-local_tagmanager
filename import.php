@@ -65,18 +65,7 @@ $mform = new \local_tagmanager\form\upload_tags_form($url->out(false), [
     'fixedcollid' => $tc,
 ]);
 
-$draftid = file_get_submitted_draft_itemid('tagfile');
-file_prepare_draft_area(
-    $draftid,
-    $context->id,
-    'local_tagmanager',
-    'tagcsv',
-    $tc,
-    ['subdirs' => 0, 'maxfiles' => 1]
-);
-
 $mform->set_data([
-    'tagfile' => $draftid,
     'tagcollid' => $tc,
 ]);
 
@@ -95,82 +84,18 @@ $error = null;
 if ($data = $mform->get_data()) {
     require_sesskey();
 
-    file_save_draft_area_files(
-        $draftid,
-        $context->id,
-        'local_tagmanager',
-        'tagcsv',
-        $tc,
-        ['subdirs' => 0, 'maxfiles' => 1]
-    );
+    // Read the upload straight from the user's draft area; the plugin keeps no copy of it.
+    $content = $mform->get_file_content('tagfile');
 
-    $fs = get_file_storage();
-    $files = $fs->get_area_files($context->id, 'local_tagmanager', 'tagcsv', $tc, 'id', false);
-
-    if (empty($files)) {
+    if ($content === false) {
         $error = get_string('notif_nofile', 'local_tagmanager');
     } else {
-        $file = reset($files);
+        $result = \local_tagmanager\importer::import_csv($tc, $content, $maxnames);
+        $successcount = $result->created;
+        $existscount = $result->existed;
+        $importednames = $result->importednames;
+        $existingnames = $result->existingnames;
 
-        $fh = fopen('php://temp', 'r+');
-        fwrite($fh, $file->get_content());
-        rewind($fh);
-
-        $firstrow = true;
-
-        while (($row = fgetcsv($fh, null, ',', '"', '\\')) !== false) {
-            $tagname = trim($row[0] ?? '');
-            $desc    = trim($row[1] ?? '');
-
-            // Skip header row
-            if ($firstrow) {
-                $firstrow = false;
-
-                $h1 = \core_text::strtolower(trim($tagname));
-                $h2 = \core_text::strtolower(trim($desc));
-
-                $isheader =
-                    ($h1 === 'tagname' || $h1 === 'tag name' || $h1 === 'name') &&
-                    ($h2 === 'description' || $h2 === 'tag description' || $h2 === 'desc');
-
-                if ($isheader) {
-                    continue;
-                }
-            }
-
-            if ($tagname === '') {
-                continue;
-            }
-
-            $existing = \core_tag_tag::get_by_name($tc, $tagname);
-            if ($existing) {
-                $existscount++;
-                if (count($existingnames) < $maxnames) {
-                    $existingnames[] = $tagname;
-                }
-                continue;
-            }
-
-            $created = \core_tag_tag::create_if_missing($tc, [$tagname]);
-            if (!empty($created)) {
-                $tag = reset($created);
-
-                if ($desc !== '') {
-                    $DB->update_record('tag', (object)[
-                        'id' => $tag->id,
-                        'description' => $desc,
-                        'timemodified' => time(),
-                    ]);
-                }
-
-                $successcount++;
-                if (count($importednames) < $maxnames) {
-                    $importednames[] = $tagname;
-                }
-            }
-        }
-
-        fclose($fh);
         $didprocess = true;
 
         $format_list = function(array $names, int $total) {
