@@ -52,8 +52,8 @@ namespace local_tagmanager;
  * @package    local_tagmanager
  * @copyright  2026 Carnegie Mellon University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @coversNothing
  */
+#[\PHPUnit\Framework\Attributes\CoversNothing]
 final class plugininfo_test extends \basic_testcase {
     public function test_plugin_is_registered_and_version_is_int(): void {
         $pm = \core_plugin_manager::instance();

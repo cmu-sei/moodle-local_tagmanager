@@ -52,8 +52,8 @@ namespace local_tagmanager;
  * @package    local_tagmanager
  * @copyright  2026 Carnegie Mellon University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @coversNothing
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(form\upload_tags_form::class)]
 final class form_class_test extends \basic_testcase {
     public function test_upload_tags_form_is_moodleform(): void {
         global $CFG;

@@ -52,8 +52,8 @@ namespace local_tagmanager;
  * @package    local_tagmanager
  * @copyright  2026 Carnegie Mellon University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @coversNothing
  */
+#[\PHPUnit\Framework\Attributes\CoversNothing]
 final class template_render_test extends \advanced_testcase {
     protected function setUp(): void {
         parent::setUp();

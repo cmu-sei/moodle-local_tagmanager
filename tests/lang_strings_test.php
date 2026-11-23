@@ -52,8 +52,8 @@ namespace local_tagmanager;
  * @package    local_tagmanager
  * @copyright  2026 Carnegie Mellon University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @coversNothing
  */
+#[\PHPUnit\Framework\Attributes\CoversNothing]
 final class lang_strings_test extends \basic_testcase {
     public function test_pluginname_string_exists(): void {
         $s = get_string('pluginname', 'local_tagmanager');
