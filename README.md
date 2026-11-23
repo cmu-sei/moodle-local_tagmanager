@@ -24,7 +24,7 @@ A lightweight Moodle plugin for managing tags in bulk. Supports uploading tags w
 - **Export Tags to CSV**
   - Export all tags in a collection or selected tags
   - Includes tag names and descriptions
-  - A cell that starts with `=`, `+`, `-` or `@` is written with a leading apostrophe so a spreadsheet shows it as text instead of running it as a formula; importing a CSV removes one leading apostrophe from a name or description that starts with one of those characters
+  - A cell that starts with `=`, `+`, `-` or `@` is written with a leading apostrophe so a spreadsheet shows it as text instead of running it as a formula; importing a CSV removes one leading apostrophe from a name or description that starts with one of those characters; the file is standard CSV, so a quote inside a cell is doubled, and a file exported by 1.1.0 with a backslash followed by a quote in a tag name or description should be exported again before importing
 
 ## Requirements
 

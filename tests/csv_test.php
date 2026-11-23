@@ -113,7 +113,6 @@ final class csv_test extends \advanced_testcase {
         fclose($out);
 
         $this->assertSame(['plain', 'x\\",=1+1,tail'], str_getcsv(trim($line), ',', '"', ''));
-        $this->assertSame(2, count(str_getcsv(trim($line), ',', '"', '')));
     }
 
     /**
@@ -149,6 +148,7 @@ final class csv_test extends \advanced_testcase {
      * Cells made only of a tab or carriage return, with the export's quote in front, import as empty and are skipped.
      */
     public function test_import_treats_a_whitespace_only_cell_as_empty(): void {
+        global $DB;
         $this->resetAfterTest();
         $tc = \core_tag_collection::get_default();
 
@@ -162,7 +162,9 @@ final class csv_test extends \advanced_testcase {
         $result = importer::import_csv($tc, $content);
 
         $this->assertSame(1, $result->created);
-        $this->assertNotFalse(\core_tag_tag::get_by_name($tc, 'kept'));
+        $kept = \core_tag_tag::get_by_name($tc, 'kept');
+        $this->assertNotFalse($kept);
+        $this->assertSame('', trim((string) $DB->get_field('tag', 'description', ['id' => $kept->id])));
     }
 
     /**
