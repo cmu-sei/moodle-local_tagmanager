@@ -44,6 +44,8 @@ DM26-0016
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_tagmanager\csv;
+
 require('../../config.php');
 require_login();
 require_sesskey();
@@ -110,14 +112,14 @@ if ($tagids !== '') {
         $tags = $DB->get_records_sql($sql, $params);
 
         foreach ($tags as $t) {
-            fputcsv($out, [$t->rawname, $t->description ?? ''], ',', '"', '\\');
+            fputcsv($out, [csv::escape_cell($t->rawname), csv::escape_cell($t->description ?? '')], ',', '"', '\\');
         }
     }
 } else {
     // Export all tags in collection.
     $tags = $DB->get_records('tag', ['tagcollid' => $collectionid], 'rawname ASC', 'id,rawname,description');
     foreach ($tags as $t) {
-        fputcsv($out, [$t->rawname, $t->description ?? ''], ',', '"', '\\');
+        fputcsv($out, [csv::escape_cell($t->rawname), csv::escape_cell($t->description ?? '')], ',', '"', '\\');
     }
 }
 fclose($out);

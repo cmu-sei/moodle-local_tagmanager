@@ -79,8 +79,8 @@ class importer {
         $firstrow = true;
 
         while (($row = fgetcsv($fh, null, ',', '"', '\\')) !== false) {
-            $tagname = trim($row[0] ?? '');
-            $desc    = trim($row[1] ?? '');
+            $tagname = csv::unescape_cell(trim($row[0] ?? ''));
+            $desc    = csv::unescape_cell(trim($row[1] ?? ''));
 
             // Skip header row.
             if ($firstrow) {
