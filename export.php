@@ -43,6 +43,7 @@ DM26-0016
  * @copyright  2026 Carnegie Mellon University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require('../../config.php');
 require_login();
 require_sesskey();
@@ -93,7 +94,7 @@ header('Content-Disposition: ' . $disposition);
 $out = fopen('php://output', 'w');
 fputcsv($out, ['tagname', 'description'], ',', '"', '\\');
 if ($tagids !== '') {
-    // Export only selected tags
+    // Export only selected tags.
     $ids = array_filter(array_map('intval', explode(',', $tagids)));
 
     if (!empty($ids)) {
@@ -113,7 +114,7 @@ if ($tagids !== '') {
         }
     }
 } else {
-    // Export all tags in collection
+    // Export all tags in collection.
     $tags = $DB->get_records('tag', ['tagcollid' => $collectionid], 'rawname ASC', 'id,rawname,description');
     foreach ($tags as $t) {
         fputcsv($out, [$t->rawname, $t->description ?? ''], ',', '"', '\\');

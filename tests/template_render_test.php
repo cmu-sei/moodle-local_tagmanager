@@ -44,8 +44,14 @@ DM26-0016
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace local_tagmanager;
-defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Tests for rendering the plugin templates.
+ *
+ * @package    local_tagmanager
+ * @copyright  2026 Carnegie Mellon University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 final class template_render_test extends \advanced_testcase {
     protected function setUp(): void {
         $this->resetAfterTest(true);

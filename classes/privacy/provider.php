@@ -35,6 +35,7 @@ Copyright notice for non-US Government use and distribution.
 This Software includes and/or makes use of Third-Party Software each subject to its own license.
 
 DM26-0016
+*/
 
 /**
  * Privacy Subsystem implementation for the Tag Manager Plugin.

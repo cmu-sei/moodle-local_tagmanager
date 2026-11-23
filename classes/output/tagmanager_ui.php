@@ -48,6 +48,13 @@ namespace local_tagmanager\output;
 use core\hook\output\before_footer_html_generation as before_footer;
 use moodle_url;
 
+/**
+ * Output helpers for the Tag Manager Plugin.
+ *
+ * @package    local_tagmanager
+ * @copyright  2026 Carnegie Mellon University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class tagmanager_ui {
     /**
      * Called from the hook. No longer renders inline UI - JavaScript handles button injection.

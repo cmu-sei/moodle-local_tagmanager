@@ -44,8 +44,14 @@ DM26-0016
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace local_tagmanager;
-defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Tests for the upload form class.
+ *
+ * @package    local_tagmanager
+ * @copyright  2026 Carnegie Mellon University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 final class form_class_test extends \basic_testcase {
     public function test_upload_tags_form_is_moodleform(): void {
         global $CFG;

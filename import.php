@@ -41,6 +41,7 @@ DM26-0016
  * @copyright  2026 Carnegie Mellon University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require('../../config.php');
 
 $tc = required_param('tc', PARAM_INT);
@@ -101,7 +102,7 @@ if ($data = $mform->get_data()) {
 
         $didprocess = true;
 
-        $format_list = function (array $names, int $total) {
+        $formatlist = function (array $names, int $total) {
             if (empty($names)) {
                 return '';
             }
@@ -114,8 +115,8 @@ if ($data = $mform->get_data()) {
             return $text;
         };
 
-        $importedlist = $format_list($importednames, $successcount);
-        $existinglist = $format_list($existingnames, $existscount);
+        $importedlist = $formatlist($importednames, $successcount);
+        $existinglist = $formatlist($existingnames, $existscount);
 
         // Build per-type messages (can include HTML).
         $successmsg = '';
@@ -136,7 +137,7 @@ if ($data = $mform->get_data()) {
                 \core\notification::add($successmsg, \core\notification::SUCCESS);
             }
             if ($warnmsg !== '') {
-                \core\notification::add($warnmsg, \core\notification::WARNING); // yellow
+                \core\notification::add($warnmsg, \core\notification::WARNING); // Shown in yellow.
             }
         }
 

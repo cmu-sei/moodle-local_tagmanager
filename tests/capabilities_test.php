@@ -44,13 +44,19 @@ DM26-0016
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace local_tagmanager;
-defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Tests for the capabilities the plugin declares.
+ *
+ * @package    local_tagmanager
+ * @copyright  2026 Carnegie Mellon University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 final class capabilities_test extends \basic_testcase {
     public function test_access_file_declares_capabilities(): void {
         global $CFG;
         $capabilities = [];
-        require($CFG->dirroot . '/local/tagmanager/db/access.php'); // populates $capabilities
+        require($CFG->dirroot . '/local/tagmanager/db/access.php'); // Populates $capabilities.
         $this->assertIsArray($capabilities);
         $this->assertNotEmpty($capabilities);
 

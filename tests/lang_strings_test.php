@@ -44,8 +44,14 @@ DM26-0016
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace local_tagmanager;
-defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Tests for the plugin language strings.
+ *
+ * @package    local_tagmanager
+ * @copyright  2026 Carnegie Mellon University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 final class lang_strings_test extends \basic_testcase {
     public function test_pluginname_string_exists(): void {
         $s = get_string('pluginname', 'local_tagmanager');
@@ -54,7 +60,7 @@ final class lang_strings_test extends \basic_testcase {
     }
 
     public function test_import_notification_strings(): void {
-        // import.php used to build these notifications from English literals, so the strings
+        // The import.php script used to build these notifications from English literals, so the strings
         // were never rendered and their trailing " in " was never noticed.
         $this->assertSame(
             'Created tag: <strong>tag-one</strong>',

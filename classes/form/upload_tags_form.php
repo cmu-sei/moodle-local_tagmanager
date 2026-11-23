@@ -48,7 +48,17 @@ namespace local_tagmanager\form;
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/formslib.php');
 
+/**
+ * Form for uploading a CSV file of tags to import.
+ *
+ * @package    local_tagmanager
+ * @copyright  2026 Carnegie Mellon University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class upload_tags_form extends \moodleform {
+    /**
+     * Define the form fields.
+     */
     public function definition() {
         global $CFG;
         $m = $this->_form;
@@ -88,6 +98,13 @@ class upload_tags_form extends \moodleform {
         $m->addGroup($btns, 'buttonar', '', ' ', false);
     }
 
+    /**
+     * Validate the submitted form data.
+     *
+     * @param array $data Submitted data.
+     * @param array $files Submitted files.
+     * @return array Errors keyed by field name.
+     */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
         $fixedcollid = $this->_customdata['fixedcollid'] ?? null;

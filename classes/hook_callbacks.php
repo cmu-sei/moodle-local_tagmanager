@@ -48,7 +48,19 @@ namespace local_tagmanager;
 use core\hook\output\before_footer_html_generation as before_footer;
 use moodle_url;
 
+/**
+ * Hook callbacks for the Tag Manager Plugin.
+ *
+ * @package    local_tagmanager
+ * @copyright  2026 Carnegie Mellon University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class hook_callbacks {
+    /**
+     * Load the tag manager scripts on the core tag management page.
+     *
+     * @param before_footer $hook The hook being dispatched.
+     */
     public static function before_footer_html_generation(before_footer $hook): void {
         global $PAGE;
 
