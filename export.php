@@ -97,7 +97,7 @@ if ($tagids !== '') {
     $ids = array_filter(array_map('intval', explode(',', $tagids)));
 
     if (!empty($ids)) {
-        list($insql, $params) = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
+        [$insql, $params] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
         $params['collid'] = $collectionid;
 
         $sql = "SELECT id, rawname, description

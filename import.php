@@ -62,7 +62,7 @@ if (!$DB->record_exists('tag_coll', ['id' => $tc])) {
     throw new moodle_exception('invalidcollection', 'local_tagmanager');
 }
 
-require_once($CFG->dirroot.'/local/tagmanager/classes/form/upload_tags_form.php');
+require_once($CFG->dirroot . '/local/tagmanager/classes/form/upload_tags_form.php');
 
 $mform = new \local_tagmanager\form\upload_tags_form($url->out(false), [
     'fixedcollid' => $tc,
@@ -101,7 +101,7 @@ if ($data = $mform->get_data()) {
 
         $didprocess = true;
 
-        $format_list = function(array $names, int $total) {
+        $format_list = function (array $names, int $total) {
             if (empty($names)) {
                 return '';
             }
@@ -141,9 +141,7 @@ if ($data = $mform->get_data()) {
         }
 
         redirect(new moodle_url('/tag/manage.php', ['tc' => $tc]));
-
     }
-
 }
 
 echo $OUTPUT->header();

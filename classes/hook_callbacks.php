@@ -71,6 +71,5 @@ class hook_callbacks {
             $tc = required_param('tc', PARAM_INT);
             $PAGE->requires->js_call_amd('local_tagmanager/managecollection', 'init', [$tc]);
         }
-
     }
 }

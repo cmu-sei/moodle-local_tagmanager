@@ -49,7 +49,6 @@ use core\hook\output\before_footer_html_generation as before_footer;
 use moodle_url;
 
 class tagmanager_ui {
-
     /**
      * Called from the hook. No longer renders inline UI - JavaScript handles button injection.
      * Kept for potential future use.
