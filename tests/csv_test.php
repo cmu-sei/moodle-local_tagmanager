@@ -92,23 +92,43 @@ final class csv_test extends \advanced_testcase {
         $this->assertSame($value, csv::unescape_cell(csv::escape_cell($value)));
     }
 
+    /**
+     * Text that is not a formula is written and read back unchanged.
+     */
     public function test_ordinary_text_is_left_alone(): void {
-        foreach (['Alpha', 'a-b', 'x=y', 'email@example.com', '', "it's", '2024-01', 'Q&A'] as $value) {
+        foreach (['Alpha', 'a-b', 'x=y', 'email@example.com', '', "it's", '2024-01', 'Q&A', "caf\u{e9} =1"] as $value) {
             $this->assertSame($value, csv::escape_cell($value));
             $this->assertSame($value, csv::unescape_cell($value));
         }
     }
 
+    /**
+     * A backslash followed by a quote cannot split a cell and leave a formula at the start of the next one.
+     */
+    public function test_write_row_doubles_quotes_after_a_backslash(): void {
+        $out = fopen('php://temp', 'r+');
+        csv::write_row($out, 'plain', 'x\\",=1+1,tail');
+        rewind($out);
+        $line = stream_get_contents($out);
+        fclose($out);
+
+        $this->assertSame(['plain', 'x\\",=1+1,tail'], str_getcsv(trim($line), ',', '"', ''));
+        $this->assertSame(2, count(str_getcsv(trim($line), ',', '"', '')));
+    }
+
+    /**
+     * Importing a file written by write_row() creates the same tags and descriptions.
+     */
     public function test_import_reads_back_what_the_export_wrote(): void {
         global $DB;
         $this->resetAfterTest();
         $tc = \core_tag_collection::get_default();
 
-        $names = ['=SUM_A1', '+44 phone', '@mention', '-1 point'];
+        $names = ['=SUM_A1', '+44 phone', '@mention', '-1 point', "'=quoted", 'back\\"slash'];
         $out = fopen('php://temp', 'r+');
-        fputcsv($out, ['tagname', 'description'], ',', '"', '\\');
+        fputcsv($out, ['tagname', 'description'], ',', '"', '');
         foreach ($names as $name) {
-            fputcsv($out, [csv::escape_cell($name), csv::escape_cell('=1+1')], ',', '"', '\\');
+            csv::write_row($out, $name, '=1+1');
         }
         rewind($out);
         $content = stream_get_contents($out);
@@ -116,12 +136,45 @@ final class csv_test extends \advanced_testcase {
 
         $result = importer::import_csv($tc, $content);
 
-        $this->assertSame(4, $result->created);
+        $this->assertSame(count($names), $result->created);
         foreach ($names as $name) {
             $tag = \core_tag_tag::get_by_name($tc, $name);
             $this->assertNotFalse($tag, "The tag $name should exist exactly as written.");
         }
         $tag = \core_tag_tag::get_by_name($tc, '@mention');
         $this->assertSame('=1+1', $DB->get_field('tag', 'description', ['id' => $tag->id]));
+    }
+
+    /**
+     * Cells made only of a tab or carriage return, with the export's quote in front, import as empty and are skipped.
+     */
+    public function test_import_treats_a_whitespace_only_cell_as_empty(): void {
+        $this->resetAfterTest();
+        $tc = \core_tag_collection::get_default();
+
+        $out = fopen('php://temp', 'r+');
+        csv::write_row($out, "\t", '');
+        csv::write_row($out, 'kept', "\r");
+        rewind($out);
+        $content = stream_get_contents($out);
+        fclose($out);
+
+        $result = importer::import_csv($tc, $content);
+
+        $this->assertSame(1, $result->created);
+        $this->assertNotFalse(\core_tag_tag::get_by_name($tc, 'kept'));
+    }
+
+    /**
+     * A quote that follows other text or a space is part of the name and survives the import.
+     */
+    public function test_import_keeps_a_quote_that_the_export_did_not_add(): void {
+        $this->resetAfterTest();
+        $tc = \core_tag_collection::get_default();
+
+        $result = importer::import_csv($tc, "ok,\"x\"\n\" '=1\",y\n");
+
+        $this->assertSame(2, $result->created);
+        $this->assertNotFalse(\core_tag_tag::get_by_name($tc, "'=1"));
     }
 }

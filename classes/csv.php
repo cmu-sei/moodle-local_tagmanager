@@ -78,4 +78,19 @@ class csv {
     public static function unescape_cell(string $value): string {
         return ($value !== '' && $value[0] === "'" && preg_match(self::FORMULA, $value)) ? substr($value, 1) : $value;
     }
+
+    /**
+     * Write one tag row to an exported CSV, guarding each cell.
+     *
+     * The escape character is empty so a quote inside a cell is always doubled; with a backslash
+     * escape, PHP leaves a quote after a backslash undoubled and a standard CSV reader would split
+     * the cell at that point, which could leave a formula at the start of a new cell.
+     *
+     * @param resource $out Open file handle.
+     * @param string $name Tag name.
+     * @param string $description Tag description.
+     */
+    public static function write_row($out, string $name, string $description): void {
+        fputcsv($out, [self::escape_cell($name), self::escape_cell($description)], ',', '"', '');
+    }
 }

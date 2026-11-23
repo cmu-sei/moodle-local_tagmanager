@@ -78,9 +78,10 @@ class importer {
 
         $firstrow = true;
 
-        while (($row = fgetcsv($fh, null, ',', '"', '\\')) !== false) {
-            $tagname = csv::unescape_cell(trim($row[0] ?? ''));
-            $desc    = csv::unescape_cell(trim($row[1] ?? ''));
+        while (($row = fgetcsv($fh, null, ',', '"', '')) !== false) {
+            // Remove the export's apostrophe first, from the cell as written, then trim as before.
+            $tagname = trim(csv::unescape_cell($row[0] ?? ''));
+            $desc    = trim(csv::unescape_cell($row[1] ?? ''));
 
             // Skip header row.
             if ($firstrow) {
