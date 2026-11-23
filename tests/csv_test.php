@@ -70,6 +70,8 @@ final class csv_test extends \advanced_testcase {
     }
 
     /**
+     * A cell a spreadsheet could read as a formula gets a leading quote.
+     *
      * @dataProvider formula_provider
      * @param string $value The tag text.
      * @param string $expected What the export should write.
@@ -80,6 +82,8 @@ final class csv_test extends \advanced_testcase {
     }
 
     /**
+     * Importing a cell undoes what the export did to it.
+     *
      * @dataProvider formula_provider
      * @param string $value The tag text.
      */
