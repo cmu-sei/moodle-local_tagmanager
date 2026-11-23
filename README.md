@@ -27,7 +27,7 @@ A lightweight Moodle plugin for managing tags in bulk. Supports uploading tags w
 
 ## Requirements
 
-Moodle 4.0 or later (requires: 2022041900)
+Moodle 5.0 or later (requires: 2025041400)
 
 ## Installation
 
