@@ -96,6 +96,7 @@ final class csv_test extends \advanced_testcase {
     }
 
     public function test_import_reads_back_what_the_export_wrote(): void {
+        global $DB;
         $this->resetAfterTest();
         $tc = \core_tag_collection::get_default();
 
@@ -116,6 +117,7 @@ final class csv_test extends \advanced_testcase {
             $tag = \core_tag_tag::get_by_name($tc, $name);
             $this->assertNotFalse($tag, "The tag $name should exist exactly as written.");
         }
-        $this->assertSame('=1+1', \core_tag_tag::get_by_name($tc, '@mention')->description);
+        $tag = \core_tag_tag::get_by_name($tc, '@mention');
+        $this->assertSame('=1+1', $DB->get_field('tag', 'description', ['id' => $tag->id]));
     }
 }
