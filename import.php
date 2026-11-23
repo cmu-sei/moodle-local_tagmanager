@@ -20,12 +20,15 @@ Local Tag Manager Plugin
 
 Copyright 2026 Carnegie Mellon University.
 
-NO WARRANTY. THIS CARNEGIE MELLON UNIVERSITY AND SOFTWARE ENGINEERING INSTITUTE MATERIAL IS FURNISHED ON AN "AS-IS" BASIS.
-CARNEGIE MELLON UNIVERSITY MAKES NO WARRANTIES OF ANY KIND, EITHER EXPRESSED OR IMPLIED, AS TO ANY MATTER INCLUDING, BUT NOT LIMITED TO,
-WARRANTY OF FITNESS FOR PURPOSE OR MERCHANTABILITY, EXCLUSIVITY, OR RESULTS OBTAINED FROM USE OF THE MATERIAL. CARNEGIE MELLON UNIVERSITY DOES NOT MAKE ANY WARRANTY OF ANY KIND WITH RESPECT TO FREEDOM FROM PATENT, TRADEMARK, OR COPYRIGHT INFRINGEMENT.
+NO WARRANTY. THIS CARNEGIE MELLON UNIVERSITY AND SOFTWARE ENGINEERING INSTITUTE MATERIAL IS FURNISHED ON AN "AS-IS"
+BASIS. CARNEGIE MELLON UNIVERSITY MAKES NO WARRANTIES OF ANY KIND, EITHER EXPRESSED OR IMPLIED, AS TO ANY MATTER
+INCLUDING, BUT NOT LIMITED TO, WARRANTY OF FITNESS FOR PURPOSE OR MERCHANTABILITY, EXCLUSIVITY, OR RESULTS OBTAINED FROM
+USE OF THE MATERIAL. CARNEGIE MELLON UNIVERSITY DOES NOT MAKE ANY WARRANTY OF ANY KIND WITH RESPECT TO FREEDOM FROM
+PATENT, TRADEMARK, OR COPYRIGHT INFRINGEMENT.
 
-Licensed under a GNU GENERAL PUBLIC LICENSE - Version 3, 29 June 2007-style license, please see license.txt or contact permission@sei.cmu.edu for full terms.
-[DISTRIBUTION STATEMENT A] This material has been approved for public release and unlimited distribution. Please see Copyright notice for non-US Government use and distribution.
+Licensed under a GNU GENERAL PUBLIC LICENSE - Version 3, 29 June 2007-style license, please see license.txt or contact
+permission@sei.cmu.edu for full terms. [DISTRIBUTION STATEMENT A] This material has been approved for public release and
+unlimited distribution. Please see Copyright notice for non-US Government use and distribution.
 
 This Software includes and/or makes use of Third-Party Software each subject to its own license.
 
@@ -38,6 +41,7 @@ DM26-0016
  * @copyright  2026 Carnegie Mellon University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require('../../config.php');
 
 $tc = required_param('tc', PARAM_INT);
@@ -59,7 +63,7 @@ if (!$DB->record_exists('tag_coll', ['id' => $tc])) {
     throw new moodle_exception('invalidcollection', 'local_tagmanager');
 }
 
-require_once($CFG->dirroot.'/local/tagmanager/classes/form/upload_tags_form.php');
+require_once($CFG->dirroot . '/local/tagmanager/classes/form/upload_tags_form.php');
 
 $mform = new \local_tagmanager\form\upload_tags_form($url->out(false), [
     'fixedcollid' => $tc,
@@ -98,7 +102,7 @@ if ($data = $mform->get_data()) {
 
         $didprocess = true;
 
-        $format_list = function(array $names, int $total) {
+        $formatlist = function (array $names, int $total) {
             if (empty($names)) {
                 return '';
             }
@@ -111,8 +115,8 @@ if ($data = $mform->get_data()) {
             return $text;
         };
 
-        $importedlist = $format_list($importednames, $successcount);
-        $existinglist = $format_list($existingnames, $existscount);
+        $importedlist = $formatlist($importednames, $successcount);
+        $existinglist = $formatlist($existingnames, $existscount);
 
         // Build per-type messages (can include HTML).
         $successmsg = '';
@@ -133,14 +137,12 @@ if ($data = $mform->get_data()) {
                 \core\notification::add($successmsg, \core\notification::SUCCESS);
             }
             if ($warnmsg !== '') {
-                \core\notification::add($warnmsg, \core\notification::WARNING); // yellow
+                \core\notification::add($warnmsg, \core\notification::WARNING); // Shown in yellow.
             }
         }
 
         redirect(new moodle_url('/tag/manage.php', ['tc' => $tc]));
-
     }
-
 }
 
 echo $OUTPUT->header();
